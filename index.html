@@ -153,40 +153,64 @@
 
   .label{
     padding:2.5mm 3mm;
-    border-bottom:1px dashed #BBB;
+    border:1.5px solid #222;
+    margin-top:-1.5px;
   }
-  .label:last-child{border-bottom:none;}
+  .label:first-child{margin-top:0;}
 
-  .label .nama{
+  .harga-row{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:2mm;
+  }
+  .harga-main{
+    display:flex;
+    align-items:baseline;
+    gap:1mm;
+  }
+  .label .rp{
     font-family:'Inter',sans-serif;
-    font-weight:600;
+    font-weight:700;
     color:var(--ink);
-    word-break:break-word;
-    line-height:1.25;
   }
   .label .harga{
     font-family:'Space Mono',monospace;
     font-weight:700;
     color:var(--ink);
-    margin-top:2mm;
     letter-spacing:-0.02em;
   }
-  .label .rp{
+  .label .satuan{
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    color:#4A4438;
+    white-space:nowrap;
+    padding-top:1mm;
+  }
+  .label .nama{
+    font-family:'Inter',sans-serif;
     font-weight:700;
-    vertical-align:top;
-    margin-right:1mm;
+    color:var(--ink);
+    word-break:break-word;
+    line-height:1.3;
+    text-align:center;
+    text-transform:uppercase;
+    margin-top:1.5mm;
   }
 
   /* font scale */
   .fs-kecil .nama{font-size:11px;}
-  .fs-kecil .harga{font-size:16px;}
-  .fs-kecil .rp{font-size:9px;}
+  .fs-kecil .harga{font-size:20px;}
+  .fs-kecil .rp{font-size:11px;}
+  .fs-kecil .satuan{font-size:10px;}
   .fs-sedang .nama{font-size:13px;}
-  .fs-sedang .harga{font-size:20px;}
-  .fs-sedang .rp{font-size:11px;}
+  .fs-sedang .harga{font-size:25px;}
+  .fs-sedang .rp{font-size:13px;}
+  .fs-sedang .satuan{font-size:12px;}
   .fs-besar .nama{font-size:15px;}
-  .fs-besar .harga{font-size:25px;}
-  .fs-besar .rp{font-size:13px;}
+  .fs-besar .harga{font-size:31px;}
+  .fs-besar .rp{font-size:15px;}
+  .fs-besar .satuan{font-size:14px;}
 
   @media print{
     body{background:white;}
@@ -216,7 +240,11 @@
           <label for="harga">Harga (Rp)</label>
           <input id="harga" type="number" min="0" placeholder="8000">
         </div>
-        <div class="field" style="max-width:90px;">
+        <div class="field" style="max-width:80px;">
+          <label for="satuan">Satuan</label>
+          <input id="satuan" type="text" placeholder="Bks">
+        </div>
+        <div class="field" style="max-width:70px;">
           <label for="qty">Jumlah</label>
           <input id="qty" type="number" min="1" value="1">
         </div>
@@ -266,6 +294,7 @@
 
   const namaInput = document.getElementById('nama');
   const hargaInput = document.getElementById('harga');
+  const satuanInput = document.getElementById('satuan');
   const qtyInput = document.getElementById('qty');
   const lebarSelect = document.getElementById('lebar');
   const fontsizeSelect = document.getElementById('fontsize');
@@ -280,14 +309,16 @@
   function addItem(){
     const nama = namaInput.value.trim();
     const harga = parseInt(hargaInput.value, 10);
+    const satuan = satuanInput.value.trim();
     const qty = Math.max(1, parseInt(qtyInput.value, 10) || 1);
     if(!nama || isNaN(harga)){
       namaInput.focus();
       return;
     }
-    items.push({nama, harga, qty});
+    items.push({nama, harga, satuan, qty});
     namaInput.value = '';
     hargaInput.value = '';
+    satuanInput.value = '';
     qtyInput.value = 1;
     namaInput.focus();
     render();
@@ -304,7 +335,7 @@
     } else {
       itemList.innerHTML = items.map((it, idx) => `
         <div class="item-row">
-          <span>${escapeHtml(it.nama)} — Rp${formatRupiah(it.harga)} ${it.qty > 1 ? '× ' + it.qty : ''}</span>
+          <span>${escapeHtml(it.nama)} — Rp${formatRupiah(it.harga)}${it.satuan ? '/' + escapeHtml(it.satuan) : ''} ${it.qty > 1 ? '× ' + it.qty : ''}</span>
           <button class="del" data-idx="${idx}" title="Hapus">✕</button>
         </div>
       `).join('');
@@ -317,8 +348,14 @@
       for(let i=0; i<it.qty; i++){
         html += `
           <div class="label">
+            <div class="harga-row">
+              <div class="harga-main">
+                <span class="rp">RP</span>
+                <span class="harga">${formatRupiah(it.harga)}</span>
+              </div>
+              ${it.satuan ? `<span class="satuan">/${escapeHtml(it.satuan)}</span>` : ''}
+            </div>
             <div class="nama">${escapeHtml(it.nama)}</div>
-            <div class="harga"><span class="rp">Rp</span>${formatRupiah(it.harga)}</div>
           </div>`;
       }
     });
