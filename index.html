@@ -3,15 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Label Harga — Cetak Rak</title>
+<title>Label Harga — Printer Thermal</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F6F1E9;
     --ink:#1E1A16;
-    --price:#C1401F;
-    --price-dark:#8E2C13;
     --accent:#2F6F5E;
     --line:#D8CFC0;
     --card:#FFFFFF;
@@ -89,13 +87,13 @@
   }
   .btn-add:hover{background:#255A4C;}
   .btn-print{
-    background:var(--price);
+    background:var(--ink);
     color:white;
     width:100%;
     font-size:15px;
     padding:14px;
   }
-  .btn-print:hover{background:var(--price-dark);}
+  .btn-print:hover{background:#000;}
   .hint{
     font-size:12px;
     color:#6B6355;
@@ -108,7 +106,7 @@
     display:flex;
     flex-direction:column;
     gap:8px;
-    max-height:280px;
+    max-height:260px;
     overflow-y:auto;
   }
   .item-row{
@@ -129,7 +127,7 @@
     font-size:16px;
     padding:0 4px;
   }
-  .item-row .del:hover{color:var(--price);}
+  .item-row .del:hover{color:#C1401F;}
   .empty{
     font-size:13px;
     color:#A69C8C;
@@ -137,94 +135,65 @@
     padding:20px 0;
   }
 
-  /* preview area */
+  /* preview area — mimics thermal paper roll */
   .preview-wrap{
     padding:32px;
     overflow:auto;
+    display:flex;
+    justify-content:center;
+    align-items:flex-start;
   }
-  .page{
+  .roll{
     background:white;
-    width:210mm;
-    min-height:297mm;
-    margin:0 auto;
     box-shadow:0 4px 24px rgba(0,0,0,0.12);
-    padding:10mm;
-    display:grid;
-    gap:4mm;
-    align-content:start;
+    padding:3mm 0;
   }
-  .page.size-kecil{grid-template-columns:repeat(4, 1fr);}
-  .page.size-sedang{grid-template-columns:repeat(3, 1fr);}
-  .page.size-besar{grid-template-columns:repeat(2, 1fr);}
+  .roll.w58{width:58mm;}
+  .roll.w80{width:80mm;}
 
   .label{
-    border:1.5px dashed #C9BFAF;
-    border-radius:4px;
-    position:relative;
-    padding:10px 8px 8px;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    background:white;
-    aspect-ratio:auto;
+    padding:2.5mm 3mm;
+    border-bottom:1px dashed #BBB;
   }
-  .size-kecil .label{min-height:26mm;}
-  .size-sedang .label{min-height:32mm;}
-  .size-besar .label{min-height:40mm;}
+  .label:last-child{border-bottom:none;}
 
-  .label .notch{
-    position:absolute;
-    top:-6px;
-    left:50%;
-    transform:translateX(-50%);
-    width:10px;
-    height:10px;
-    background:var(--paper);
-    border:1.5px dashed #C9BFAF;
-    border-radius:50%;
-  }
   .label .nama{
     font-family:'Inter',sans-serif;
     font-weight:600;
-    font-size:11px;
-    line-height:1.3;
     color:var(--ink);
     word-break:break-word;
+    line-height:1.25;
   }
-  .size-sedang .label .nama{font-size:12.5px;}
-  .size-besar .label .nama{font-size:14px;}
-
   .label .harga{
     font-family:'Space Mono',monospace;
     font-weight:700;
-    font-size:17px;
-    color:var(--price);
-    margin-top:6px;
+    color:var(--ink);
+    margin-top:2mm;
     letter-spacing:-0.02em;
   }
-  .size-sedang .label .harga{font-size:20px;}
-  .size-besar .label .harga{font-size:26px;}
-
   .label .rp{
-    font-size:10px;
     font-weight:700;
     vertical-align:top;
-    margin-right:2px;
-    color:var(--price-dark);
+    margin-right:1mm;
   }
+
+  /* font scale */
+  .fs-kecil .nama{font-size:11px;}
+  .fs-kecil .harga{font-size:16px;}
+  .fs-kecil .rp{font-size:9px;}
+  .fs-sedang .nama{font-size:13px;}
+  .fs-sedang .harga{font-size:20px;}
+  .fs-sedang .rp{font-size:11px;}
+  .fs-besar .nama{font-size:15px;}
+  .fs-besar .harga{font-size:25px;}
+  .fs-besar .rp{font-size:13px;}
 
   @media print{
     body{background:white;}
     .panel{display:none;}
     .app{display:block;}
-    .preview-wrap{padding:0;}
-    .page{
-      box-shadow:none;
-      margin:0;
-      width:auto;
-      min-height:auto;
-    }
-    @page{size:A4; margin:10mm;}
+    .preview-wrap{padding:0; display:block;}
+    .roll{box-shadow:none; margin:0; padding:0;}
   }
 </style>
 </head>
@@ -233,19 +202,19 @@
 <div class="app">
   <div class="panel">
     <div>
-      <h1>Label Harga</h1>
-      <p class="sub">Isi nama barang &amp; harga, lalu cetak. Cocok digunting dan ditempel di rak.</p>
+      <h1>Label Harga — Thermal</h1>
+      <p class="sub">Untuk dicetak langsung via printer Bluetooth thermal. Isi nama &amp; harga, lalu cetak.</p>
     </div>
 
     <div>
       <div class="field">
         <label for="nama">Nama Barang</label>
-        <input id="nama" type="text" placeholder="Contoh: Indomie Goreng">
+        <input id="nama" type="text" placeholder="Contoh: Cup gelas">
       </div>
       <div class="row">
         <div class="field">
           <label for="harga">Harga (Rp)</label>
-          <input id="harga" type="number" min="0" placeholder="3500">
+          <input id="harga" type="number" min="0" placeholder="8000">
         </div>
         <div class="field" style="max-width:90px;">
           <label for="qty">Jumlah</label>
@@ -255,13 +224,22 @@
       <button class="btn-add" id="addBtn" style="width:100%;">+ Tambah Label</button>
     </div>
 
-    <div class="field">
-      <label for="ukuran">Ukuran Label</label>
-      <select id="ukuran">
-        <option value="kecil">Kecil — 4 kolom (±5×3 cm)</option>
-        <option value="sedang" selected>Sedang — 3 kolom (±6×4 cm)</option>
-        <option value="besar">Besar — 2 kolom (±9×5 cm)</option>
-      </select>
+    <div class="row">
+      <div class="field">
+        <label for="lebar">Lebar Kertas</label>
+        <select id="lebar">
+          <option value="58">58mm</option>
+          <option value="80" selected>80mm</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fontsize">Ukuran Teks</label>
+        <select id="fontsize">
+          <option value="kecil">Kecil</option>
+          <option value="sedang" selected>Sedang</option>
+          <option value="besar">Besar</option>
+        </select>
+      </div>
     </div>
 
     <div>
@@ -271,15 +249,15 @@
       </div>
     </div>
 
-    <button class="btn-print" id="printBtn">Cetak / Simpan PDF</button>
+    <button class="btn-print" id="printBtn">Cetak ke Printer Bluetooth</button>
 
     <div class="hint">
-      <strong>Rekomendasi printer:</strong> pakai printer inkjet/laser biasa (bukan thermal), dicetak di kertas A4 — bisa kertas stiker label kalau mau langsung tempel, atau kertas HVS biasa lalu digunting dan dilaminating/selotip. Printer thermal struk kurang cocok karena ukurannya sempit dan tintanya cepat pudar kena cahaya.
+      <strong>Cara cetak:</strong> pastikan printer Bluetooth thermal sudah terhubung ke HP (lewat aplikasi/driver printernya atau langsung dari sistem Android). Tekan tombol cetak di atas, lalu pilih nama printer thermal kamu di kotak dialog print, dan set ukuran kertas sesuai lebar roll (58mm/80mm) kalau ada opsinya.
     </div>
   </div>
 
   <div class="preview-wrap">
-    <div class="page size-sedang" id="page"></div>
+    <div class="roll w80 fs-sedang" id="roll"></div>
   </div>
 </div>
 
@@ -289,10 +267,11 @@
   const namaInput = document.getElementById('nama');
   const hargaInput = document.getElementById('harga');
   const qtyInput = document.getElementById('qty');
-  const ukuranSelect = document.getElementById('ukuran');
+  const lebarSelect = document.getElementById('lebar');
+  const fontsizeSelect = document.getElementById('fontsize');
   const itemList = document.getElementById('itemList');
   const countLabel = document.getElementById('countLabel');
-  const page = document.getElementById('page');
+  const roll = document.getElementById('roll');
 
   function formatRupiah(n){
     return new Intl.NumberFormat('id-ID').format(n);
@@ -320,33 +299,30 @@
   }
 
   function render(){
-    // sidebar list
     if(items.length === 0){
       itemList.innerHTML = '<div class="empty">Belum ada label ditambahkan</div>';
     } else {
       itemList.innerHTML = items.map((it, idx) => `
         <div class="item-row">
-          <span>${it.nama} — Rp${formatRupiah(it.harga)} ${it.qty > 1 ? '× ' + it.qty : ''}</span>
+          <span>${escapeHtml(it.nama)} — Rp${formatRupiah(it.harga)} ${it.qty > 1 ? '× ' + it.qty : ''}</span>
           <button class="del" data-idx="${idx}" title="Hapus">✕</button>
         </div>
       `).join('');
     }
     countLabel.textContent = items.reduce((sum, it) => sum + it.qty, 0);
 
-    // print preview
-    page.className = 'page size-' + ukuranSelect.value;
-    let labelsHtml = '';
+    roll.className = 'roll w' + lebarSelect.value + ' fs-' + fontsizeSelect.value;
+    let html = '';
     items.forEach(it => {
       for(let i=0; i<it.qty; i++){
-        labelsHtml += `
+        html += `
           <div class="label">
-            <div class="notch"></div>
             <div class="nama">${escapeHtml(it.nama)}</div>
             <div class="harga"><span class="rp">Rp</span>${formatRupiah(it.harga)}</div>
           </div>`;
       }
     });
-    page.innerHTML = labelsHtml || '<div class="empty" style="grid-column:1/-1;">Preview label akan muncul di sini</div>';
+    roll.innerHTML = html || '<div class="empty">Preview label akan muncul di sini</div>';
   }
 
   function escapeHtml(str){
@@ -357,7 +333,8 @@
 
   document.getElementById('addBtn').addEventListener('click', addItem);
   document.getElementById('printBtn').addEventListener('click', () => window.print());
-  ukuranSelect.addEventListener('change', render);
+  lebarSelect.addEventListener('change', render);
+  fontsizeSelect.addEventListener('change', render);
   itemList.addEventListener('click', (e) => {
     if(e.target.classList.contains('del')){
       removeItem(parseInt(e.target.dataset.idx, 10));
